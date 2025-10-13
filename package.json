@@ -1,7 +1,7 @@
 {
   "name": "expo-bixolon",
   "version": "0.1.0",
-  "description": "My new module",
+  "description": "Expo module for controlling Bixolon thermal printers with Bluetooth connectivity",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -19,7 +19,12 @@
     "react-native",
     "expo",
     "expo-bixolon",
-    "ExpoBixolon"
+    "ExpoBixolon",
+    "bixolon",
+    "printer",
+    "thermal-printer",
+    "bluetooth",
+    "printing"
   ],
   "repository": "https://github.com/LuisJSincpro/expo-bixlon",
   "bugs": {

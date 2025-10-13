@@ -4,6 +4,6 @@
     "modules": ["ExpoBixolonModule"]
   },
   "android": {
-    "modules": ["expo.sincpro.bixolon.ExpoBixolonModule"]
+    "modules": ["expo.sincpro.ExpoBixolonModule"]
   }
 }
