@@ -7,7 +7,9 @@ import android.content.Context
 import android.util.Log
 import sincpro.expo.printer.domain.BluetoothDeviceInfo
 import sincpro.expo.printer.domain.BluetoothDeviceType
-import sincpro.expo.printer.domain.BluetoothException
+import sincpro.expo.printer.domain.BluetoothDisabledException
+import sincpro.expo.printer.domain.BluetoothNotSupportedException
+import sincpro.expo.printer.domain.BluetoothPermissionDeniedException
 import sincpro.expo.printer.domain.IBluetoothProvider
 
 /**

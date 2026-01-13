@@ -2,10 +2,11 @@ package sincpro.expo.printer.service
 
 import android.util.Log
 import sincpro.expo.printer.domain.BluetoothDeviceInfo
-import sincpro.expo.printer.domain.BluetoothException
 import sincpro.expo.printer.domain.ConnectionConfig
-import sincpro.expo.printer.domain.ConnectionException
+import sincpro.expo.printer.domain.ConnectionFailedException
 import sincpro.expo.printer.domain.ConnectionInfo
+import sincpro.expo.printer.domain.ConnectionStatus
+import sincpro.expo.printer.domain.ConnectionType
 import sincpro.expo.printer.domain.IBluetoothProvider
 import sincpro.expo.printer.domain.IPrinterAdapter
 import sincpro.expo.printer.infrastructure.orchestration.EventBus
