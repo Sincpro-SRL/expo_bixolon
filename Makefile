@@ -33,8 +33,12 @@ ifndef VERSION
 	$(error VERSION is required. Usage: make update-version VERSION=1.2.3)
 endif
 	@echo "Updating version to $(VERSION) using npm..."
-	@npm version $(VERSION) --no-git-tag-version
-	@echo "Version updated successfully"
+	@CURRENT_VERSION=$$(node -p "require('./package.json').version"); \
+	if [ "$$CURRENT_VERSION" = "$(VERSION)" ]; then \
+		echo "✓ Version is already $(VERSION), skipping update"; \
+	else \
+		npm version $(VERSION) --no-git-tag-version && echo "✓ Version updated successfully"; \
+	fi
 
 publish: build
 	@echo "Publishing to NPM..."
