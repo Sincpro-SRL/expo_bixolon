@@ -2,6 +2,9 @@
 #
 .DS_Store
 
+# NPM temporary files
+.npmrc.tmp
+
 # VSCode
 .vscode/
 jsconfig.json

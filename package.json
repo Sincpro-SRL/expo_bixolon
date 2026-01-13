@@ -48,12 +48,11 @@
   "author": "Gutierrez, Andres <andru1236@gmail.com> (https://github.com/andru1236)",
   "license": "MIT",
   "homepage": "https://github.com/Sincpro-SRL/expo_bixolon#readme",
-  "dependencies": {},
   "devDependencies": {
     "@types/react": "~19.0.0",
-    "expo-module-scripts": "^5.0.8",
     "expo": "~54.0.0",
-    "prettier": "^3.2.5",
+    "expo-module-scripts": "^5.0.8",
+    "prettier": "^3.7.4",
     "react-native": "0.79.1"
   },
   "peerDependencies": {
