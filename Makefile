@@ -42,11 +42,17 @@ endif
 
 publish: build
 	@echo "Publishing to NPM..."
-	@if [ -z "$$NPM_TOKEN" ] && [ -z "$$NODE_AUTH_TOKEN" ]; then \
-		echo "⚠️  Publishing locally - make sure you are logged in (npm login)"; \
+	@if [ -n "$$NPM_TOKEN" ]; then \
+		echo "📦 Publishing to NPM via CI/CD with NPM_TOKEN"; \
+		echo "//registry.npmjs.org/:_authToken=$$NPM_TOKEN" > .npmrc.tmp; \
+		chmod 600 .npmrc.tmp; \
+		npm publish --access public --userconfig .npmrc.tmp; \
+		rm -f .npmrc.tmp; \
+	elif [ -n "$$NODE_AUTH_TOKEN" ]; then \
+		echo "📦 Publishing to NPM via CI/CD with NODE_AUTH_TOKEN"; \
 		npm publish --access public; \
 	else \
-		echo "📦 Publishing to NPM via CI/CD"; \
+		echo "⚠️  Publishing locally - make sure you are logged in (npm login)"; \
 		npm publish --access public; \
 	fi
 	@echo "✓ Package published successfully"
