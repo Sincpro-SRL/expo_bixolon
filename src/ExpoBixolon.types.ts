@@ -1,4 +1,3 @@
-
 export interface BluetoothDevice {
   name: string;
   address: string;
@@ -24,11 +23,11 @@ export interface BixolonPrinterInterface {
   connectPrinter(interfaceType: string, address: string, port: number): Promise<boolean>;
   disconnectPrinter(): Promise<boolean>;
   executeCommand(command: string): Promise<boolean>;
-  
+
   testPlainText(text: string): Promise<boolean>;
-  
+
   printInvoice(invoiceText: string): Promise<boolean>;
-  
+
   printQRCode(text: string, size?: number): Promise<boolean>;
   printQRCodeAdvanced(
     data: string,
@@ -42,7 +41,7 @@ export interface BixolonPrinterInterface {
   printFormattedText(text: string, fontSize?: number): Promise<boolean>;
   printTextSimple(text: string): Promise<boolean>;
   printTextInPages(text: string): Promise<boolean>;
-  
+
   requestBluetoothPermissions(): Promise<boolean>;
   checkBluetoothPermissions(): Promise<BluetoothPermissions>;
   discoverBluetoothDevices(): Promise<BluetoothDevice[]>;
@@ -59,4 +58,3 @@ export type ExpoBixolonModuleEvents = {
   onPrinterDisconnected: () => void;
   onPrintComplete: (success: boolean) => void;
 };
-

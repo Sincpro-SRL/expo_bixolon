@@ -65,14 +65,14 @@ const BluetoothDeviceList: React.FC<BluetoothDeviceListProps> = ({
           {devices.length} device{devices.length !== 1 ? 's' : ''} found
         </Text>
       </View>
-      
+
       {isLoading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#007AFF" />
           <Text style={styles.loadingText}>Discovering devices...</Text>
         </View>
       )}
-      
+
       <FlatList
         data={devices}
         renderItem={renderDevice}

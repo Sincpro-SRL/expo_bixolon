@@ -20,7 +20,7 @@ export default function QRCodeScreen() {
     try {
       const qrPrinter = QrCodePrinter.getInstance();
       const result = await qrPrinter.printSimpleQRCode(qrData, parseInt(qrSize));
-      
+
       if (result) {
         Alert.alert('Success', 'QR code printed successfully!');
       } else {
@@ -35,7 +35,7 @@ export default function QRCodeScreen() {
     try {
       const qrPrinter = QrCodePrinter.getInstance();
       const result = await qrPrinter.printURLQRCode(qrData, parseInt(qrSize));
-      
+
       if (result) {
         Alert.alert('Success', 'URL QR code printed successfully!');
       } else {
@@ -54,11 +54,11 @@ export default function QRCodeScreen() {
         phone: '+1234567890',
         email: 'john.doe@example.com',
         company: 'Example Corp',
-        title: 'Software Engineer'
+        title: 'Software Engineer',
       };
-      
+
       const result = await qrPrinter.printContactQRCode(contact, parseInt(qrSize));
-      
+
       if (result) {
         Alert.alert('Success', 'Contact QR code printed successfully!');
       } else {
@@ -78,7 +78,7 @@ export default function QRCodeScreen() {
         'WPA',
         parseInt(qrSize)
       );
-      
+
       if (result) {
         Alert.alert('Success', 'WiFi QR code printed successfully!');
       } else {
@@ -92,7 +92,7 @@ export default function QRCodeScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>QR Code Printing</Text>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>QR Code Data</Text>
         <TextInput
@@ -101,7 +101,7 @@ export default function QRCodeScreen() {
           value={qrData}
           onChangeText={setQrData}
         />
-        
+
         <Text style={styles.label}>Size (1-10):</Text>
         <TextInput
           style={styles.numberInput}
@@ -114,19 +114,19 @@ export default function QRCodeScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Print Options</Text>
-        
+
         <TouchableOpacity style={styles.button} onPress={printSimpleQR}>
           <Text style={styles.buttonText}>Print Simple QR Code</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.button} onPress={printURLQR}>
           <Text style={styles.buttonText}>Print URL QR Code</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.button} onPress={printContactQR}>
           <Text style={styles.buttonText}>Print Contact QR Code</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.button} onPress={printWiFiQR}>
           <Text style={styles.buttonText}>Print WiFi QR Code</Text>
         </TouchableOpacity>
@@ -134,18 +134,10 @@ export default function QRCodeScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Instructions</Text>
-        <Text style={styles.instruction}>
-          1. Make sure the printer is connected first
-        </Text>
-        <Text style={styles.instruction}>
-          2. Enter the data you want to encode in the QR code
-        </Text>
-        <Text style={styles.instruction}>
-          3. Set the size (1-10, recommended: 7-9)
-        </Text>
-        <Text style={styles.instruction}>
-          4. Choose the type of QR code to print
-        </Text>
+        <Text style={styles.instruction}>1. Make sure the printer is connected first</Text>
+        <Text style={styles.instruction}>2. Enter the data you want to encode in the QR code</Text>
+        <Text style={styles.instruction}>3. Set the size (1-10, recommended: 7-9)</Text>
+        <Text style={styles.instruction}>4. Choose the type of QR code to print</Text>
       </View>
     </ScrollView>
   );

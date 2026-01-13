@@ -8,12 +8,12 @@ export interface QRCodeOptions {
 export interface QRCodeConstants {
   QR_CODE_MODEL1: number;
   QR_CODE_MODEL2: number;
-  
+
   ECC_LEVEL_7: number;
   ECC_LEVEL_15: number;
   ECC_LEVEL_25: number;
   ECC_LEVEL_30: number;
-  
+
   ROTATION_NONE: number;
   ROTATION_90_DEGREES: number;
   ROTATION_180_DEGREES: number;
@@ -53,10 +53,7 @@ export class QrCodePrinter {
         await this.initialize();
       }
 
-      const {
-        data,
-        size = 9
-      } = options;
+      const { data, size = 9 } = options;
 
       if (!data || data.trim().length === 0) {
         throw new Error('QR code data cannot be empty');
@@ -75,7 +72,6 @@ export class QrCodePrinter {
         size,
         'NONE'
       );
-
     } catch (error) {
       console.error('Error printing QR code:', error);
       throw error;
@@ -85,7 +81,7 @@ export class QrCodePrinter {
   public async printSimpleQRCode(data: string, size: number = 9): Promise<boolean> {
     return this.printQRCode({
       data,
-      size
+      size,
     });
   }
 
@@ -95,42 +91,53 @@ export class QrCodePrinter {
     }
     return this.printQRCode({
       data: url,
-      size
+      size,
     });
   }
 
-  public async printContactQRCode(contact: {
-    name: string;
-    phone?: string;
-    email?: string;
-    company?: string;
-    title?: string;
-  }, size: number = 9): Promise<boolean> {
+  public async printContactQRCode(
+    contact: {
+      name: string;
+      phone?: string;
+      email?: string;
+      company?: string;
+      title?: string;
+    },
+    size: number = 9
+  ): Promise<boolean> {
     const vCard = this.generateVCard(contact);
     return this.printQRCode({
       data: vCard,
-      size
+      size,
     });
   }
 
-  public async printWiFiQRCode(ssid: string, password: string, encryption: 'WPA' | 'WEP' | 'nopass' = 'WPA', size: number = 9): Promise<boolean> {
+  public async printWiFiQRCode(
+    ssid: string,
+    password: string,
+    encryption: 'WPA' | 'WEP' | 'nopass' = 'WPA',
+    size: number = 9
+  ): Promise<boolean> {
     const wifiString = `WIFI:T:${encryption};S:${ssid};P:${password};;`;
     return this.printQRCode({
       data: wifiString,
-      size
+      size,
     });
   }
 
-  public async printPaymentQRCode(paymentData: {
-    amount: number;
-    currency: string;
-    description?: string;
-    merchantName?: string;
-  }, size: number = 0): Promise<boolean> {
+  public async printPaymentQRCode(
+    paymentData: {
+      amount: number;
+      currency: string;
+      description?: string;
+      merchantName?: string;
+    },
+    size: number = 0
+  ): Promise<boolean> {
     const paymentString = this.generatePaymentString(paymentData);
     return this.printQRCode({
       data: paymentString,
-      size
+      size,
     });
   }
 
@@ -143,23 +150,23 @@ export class QrCodePrinter {
   }): string {
     let vCard = 'BEGIN:VCARD\nVERSION:3.0\n';
     vCard += `FN:${contact.name}\n`;
-    
+
     if (contact.phone) {
       vCard += `TEL:${contact.phone}\n`;
     }
-    
+
     if (contact.email) {
       vCard += `EMAIL:${contact.email}\n`;
     }
-    
+
     if (contact.company) {
       vCard += `ORG:${contact.company}\n`;
     }
-    
+
     if (contact.title) {
       vCard += `TITLE:${contact.title}\n`;
     }
-    
+
     vCard += 'END:VCARD';
     return vCard;
   }
@@ -170,7 +177,9 @@ export class QrCodePrinter {
     description?: string;
     merchantName?: string;
   }): string {
-    return `PAYMENT:${paymentData.amount}${paymentData.currency}${paymentData.description ? ':' + paymentData.description : ''}`;
+    return `PAYMENT:${paymentData.amount}${paymentData.currency}${
+      paymentData.description ? ':' + paymentData.description : ''
+    }`;
   }
 
   public getConstants(): QRCodeConstants {
@@ -184,7 +193,7 @@ export class QrCodePrinter {
       ROTATION_NONE: 0,
       ROTATION_90_DEGREES: 90,
       ROTATION_180_DEGREES: 180,
-      ROTATION_270_DEGREES: 270
+      ROTATION_270_DEGREES: 270,
     };
   }
 }

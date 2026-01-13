@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BluetoothPermissions } from 'expo-bixolon';
 
 interface PermissionStatusProps {
@@ -24,52 +19,72 @@ const PermissionStatus: React.FC<PermissionStatusProps> = ({
     return granted ? '#4CAF50' : '#F44336';
   };
 
-  const hasAllPermissions = Object.values(permissions).every(granted => granted);
+  const hasAllPermissions = Object.values(permissions).every((granted) => granted);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Permission Status</Text>
-      
+
       <View style={styles.permissionList}>
         <View style={styles.permissionItem}>
           <Text style={styles.permissionName}>Location (Fine)</Text>
-          <Text style={[styles.permissionStatus, { color: getPermissionColor(permissions.ACCESS_FINE_LOCATION) }]}>
+          <Text
+            style={[
+              styles.permissionStatus,
+              { color: getPermissionColor(permissions.ACCESS_FINE_LOCATION) },
+            ]}
+          >
             {getPermissionStatus(permissions.ACCESS_FINE_LOCATION)}
           </Text>
         </View>
-        
+
         <View style={styles.permissionItem}>
           <Text style={styles.permissionName}>Location (Coarse)</Text>
-          <Text style={[styles.permissionStatus, { color: getPermissionColor(permissions.ACCESS_COARSE_LOCATION) }]}>
+          <Text
+            style={[
+              styles.permissionStatus,
+              { color: getPermissionColor(permissions.ACCESS_COARSE_LOCATION) },
+            ]}
+          >
             {getPermissionStatus(permissions.ACCESS_COARSE_LOCATION)}
           </Text>
         </View>
-        
+
         {permissions.BLUETOOTH_SCAN !== undefined && (
           <View style={styles.permissionItem}>
             <Text style={styles.permissionName}>Bluetooth Scan</Text>
-            <Text style={[styles.permissionStatus, { color: getPermissionColor(permissions.BLUETOOTH_SCAN) }]}>
+            <Text
+              style={[
+                styles.permissionStatus,
+                { color: getPermissionColor(permissions.BLUETOOTH_SCAN) },
+              ]}
+            >
               {getPermissionStatus(permissions.BLUETOOTH_SCAN)}
             </Text>
           </View>
         )}
-        
+
         {permissions.BLUETOOTH_CONNECT !== undefined && (
           <View style={styles.permissionItem}>
             <Text style={styles.permissionName}>Bluetooth Connect</Text>
-            <Text style={[styles.permissionStatus, { color: getPermissionColor(permissions.BLUETOOTH_CONNECT) }]}>
+            <Text
+              style={[
+                styles.permissionStatus,
+                { color: getPermissionColor(permissions.BLUETOOTH_CONNECT) },
+              ]}
+            >
               {getPermissionStatus(permissions.BLUETOOTH_CONNECT)}
             </Text>
           </View>
         )}
       </View>
-      
+
       {!hasAllPermissions && (
         <TouchableOpacity style={styles.requestButton} onPress={onRequestPermissions}>
           <Text style={styles.requestButtonText}>Request Permissions</Text>
         </TouchableOpacity>
       )}
-      
+
       {hasAllPermissions && (
         <View style={styles.allGrantedContainer}>
           <Text style={styles.allGrantedText}>✅ All permissions granted!</Text>

@@ -175,11 +175,7 @@ export default function PrinterApp() {
 
   const connectToDevice = async (device: BluetoothDevice) => {
     try {
-      const success = await BixolonPrinter.connectPrinter(
-        'BLUETOOTH',
-        device.address,
-        1
-      );
+      const success = await BixolonPrinter.connectPrinter('BLUETOOTH', device.address, 1);
       if (success) {
         setIsConnected(true);
         Alert.alert('Success', 'Connected to printer');
@@ -203,11 +199,7 @@ export default function PrinterApp() {
   return (
     <View style={{ padding: 20 }}>
       <Button title="Discover Devices" onPress={discoverDevices} />
-      <Button 
-        title="Print Test" 
-        onPress={printTest} 
-        disabled={!isConnected}
-      />
+      <Button title="Print Test" onPress={printTest} disabled={!isConnected} />
       {/* Render device list */}
     </View>
   );
@@ -223,9 +215,9 @@ export default function PrinterApp() {
 const checkPermissions = async () => {
   const permissions = await BixolonPrinter.checkBluetoothPermissions();
   console.log('Permissions:', permissions);
-  
+
   // Check if all required permissions are granted
-  const allGranted = Object.values(permissions).every(granted => granted);
+  const allGranted = Object.values(permissions).every((granted) => granted);
   if (!allGranted) {
     await requestPermissions();
   }
@@ -257,15 +249,14 @@ const discoverDevices = async () => {
 
     // Start discovery
     await BixolonPrinter.startBluetoothDiscovery();
-    
+
     // Get paired devices
     const devices = await BixolonPrinter.discoverBluetoothDevices();
     console.log('Found devices:', devices);
-    
+
     // Filter for printer devices
-    const printers = devices.filter(device => device.isPrinter);
+    const printers = devices.filter((device) => device.isPrinter);
     console.log('Printer devices:', printers);
-    
   } catch (error) {
     console.error('Device discovery failed:', error);
   } finally {
@@ -282,13 +273,13 @@ const discoverDevices = async () => {
 const connectToDevice = async (device: BluetoothDevice) => {
   try {
     console.log(`Connecting to ${device.name} (${device.address})...`);
-    
+
     const success = await BixolonPrinter.connectPrinter(
-      'BLUETOOTH',  // Interface type
-      device.address,  // Device MAC address
-      1  // Port (usually 1 for Bluetooth)
+      'BLUETOOTH', // Interface type
+      device.address, // Device MAC address
+      1 // Port (usually 1 for Bluetooth)
     );
-    
+
     if (success) {
       console.log('✅ Connected to printer successfully');
       setIsConnected(true);
@@ -304,12 +295,8 @@ const connectToDevice = async (device: BluetoothDevice) => {
 // Connect via WiFi (if supported)
 const connectViaWiFi = async (ipAddress: string, port: number = 9100) => {
   try {
-    const success = await BixolonPrinter.connectPrinter(
-      'WIFI',
-      ipAddress,
-      port
-    );
-    
+    const success = await BixolonPrinter.connectPrinter('WIFI', ipAddress, port);
+
     if (success) {
       console.log('✅ Connected via WiFi');
     }
@@ -355,7 +342,7 @@ Thank you for your business!`;
 const printLongText = async () => {
   try {
     const longText = `This is a very long text that will be split into multiple pages for better printing on thermal printers...`;
-    
+
     const success = await BixolonPrinter.printTextInPages(longText);
     if (success) {
       console.log('✅ Long text printed in pages');
@@ -369,17 +356,17 @@ const printLongText = async () => {
 const printInvoice = async () => {
   try {
     const items = [
-      { description: 'Premium Coffee', quantity: 2, price: 4.50 },
+      { description: 'Premium Coffee', quantity: 2, price: 4.5 },
       { description: 'Chocolate Croissant', quantity: 1, price: 3.25 },
       { description: 'Fresh Orange Juice', quantity: 1, price: 2.75 },
     ];
-    
+
     const success = await BixolonPrinter.printInvoice(
-      'Jane Smith',  // Customer name
-      items,         // Items array
-      15.00          // Total amount
+      'Jane Smith', // Customer name
+      items, // Items array
+      15.0 // Total amount
     );
-    
+
     if (success) {
       console.log('✅ Invoice printed successfully');
     }
@@ -466,19 +453,23 @@ npx expo run:ios
 ### Core Methods
 
 #### `initializePrinter(): Promise<boolean>`
+
 Initializes the printer module. Must be called before any other operations.
 
 **Returns:** `Promise<boolean>` - `true` if initialization successful
 
 **Example:**
+
 ```typescript
 const success = await BixolonPrinter.initializePrinter();
 ```
 
 #### `connectPrinter(interfaceType: string, address: string, port: number): Promise<boolean>`
+
 Connects to a printer using the specified interface type, address, and port.
 
 **Parameters:**
+
 - `interfaceType`: `'BLUETOOTH' | 'WIFI' | 'USB'`
 - `address`: Device MAC address (Bluetooth) or IP address (WiFi)
 - `port`: Port number (usually 1 for Bluetooth, 9100 for WiFi)
@@ -486,77 +477,96 @@ Connects to a printer using the specified interface type, address, and port.
 **Returns:** `Promise<boolean>` - `true` if connection successful
 
 **Example:**
+
 ```typescript
 const success = await BixolonPrinter.connectPrinter('BLUETOOTH', '00:11:22:33:44:55', 1);
 ```
 
 #### `disconnectPrinter(): Promise<boolean>`
+
 Disconnects from the currently connected printer.
 
 **Returns:** `Promise<boolean>` - `true` if disconnection successful
 
 #### `executeCommand(command: string): Promise<boolean>`
+
 Executes a raw command on the printer.
 
 **Parameters:**
+
 - `command`: Raw command string to send to printer
 
 ### Printing Methods
 
 #### `testPlainText(text: string): Promise<boolean>`
+
 Prints plain text to the connected printer.
 
 **Parameters:**
+
 - `text`: Text content to print
 
 #### `printFormattedText(text: string, fontSize?: number): Promise<boolean>`
+
 Prints formatted text with optional font size.
 
 **Parameters:**
+
 - `text`: Formatted text content
 - `fontSize`: Optional font size (default: 10)
 
 #### `printTextSimple(text: string): Promise<boolean>`
+
 Prints text using simple formatting (line-by-line).
 
 #### `printTextInPages(text: string): Promise<boolean>`
+
 Prints long text split into multiple pages.
 
 #### `printInvoice(invoiceText: string): Promise<boolean>`
+
 Prints a complete invoice from formatted text.
 
 **Parameters:**
+
 - `invoiceText`: Complete invoice text with formatting
 
 ### Bluetooth Methods
 
 #### `requestBluetoothPermissions(): Promise<boolean>`
+
 Requests necessary Bluetooth and location permissions.
 
 **Returns:** `Promise<boolean>` - `true` if permissions granted
 
 #### `checkBluetoothPermissions(): Promise<BluetoothPermissions>`
+
 Returns the current status of Bluetooth and location permissions.
 
 **Returns:** `Promise<BluetoothPermissions>` - Object with permission status
 
 #### `discoverBluetoothDevices(): Promise<BluetoothDevice[]>`
+
 Discovers available Bluetooth devices.
 
 **Returns:** `Promise<BluetoothDevice[]>` - Array of discovered devices
 
 #### `startBluetoothDiscovery(): Promise<boolean>`
+
 Starts the Bluetooth device discovery process.
 
 #### `stopBluetoothDiscovery(): Promise<boolean>`
+
 Stops the Bluetooth device discovery process.
 
 #### `isBluetoothEnabled(): Promise<boolean>`
+
 Checks if Bluetooth is enabled on the device.
 
 ## Types
 
 ### BluetoothDevice
+
 ```typescript
 interface BluetoothDevice {
   name: string;
@@ -567,6 +577,7 @@ interface BluetoothDevice {
 ```
 
 ### BluetoothPermissions
+
 ```typescript
 interface BluetoothPermissions {
   ACCESS_FINE_LOCATION: boolean;
@@ -577,6 +588,7 @@ interface BluetoothPermissions {
 ```
 
 ### InvoiceItem
+
 ```typescript
 interface InvoiceItem {
   description: string;
@@ -613,7 +625,7 @@ const options: QRCodeOptions = {
   model: 'MODEL2',
   eccLevel: 'ECC_LEVEL_15',
   size: 9,
-  rotation: 'NONE'
+  rotation: 'NONE',
 };
 
 await qrPrinter.printQRCode(options);
@@ -622,40 +634,39 @@ await qrPrinter.printQRCode(options);
 ### Specialized QR Code Types
 
 #### URL QR Code
+
 ```typescript
 await qrPrinter.printURLQRCode('www.example.com', 9);
 ```
 
 #### Contact QR Code (vCard)
+
 ```typescript
 const contact = {
   name: 'John Doe',
   phone: '+1234567890',
   email: 'john.doe@example.com',
   company: 'Example Corp',
-  title: 'Software Engineer'
+  title: 'Software Engineer',
 };
 
 await qrPrinter.printContactQRCode(contact, 9);
 ```
 
 #### WiFi QR Code
+
 ```typescript
-await qrPrinter.printWiFiQRCode(
-  'MyWiFiNetwork',
-  'password123',
-  'WPA',
-  9
-);
+await qrPrinter.printWiFiQRCode('MyWiFiNetwork', 'password123', 'WPA', 9);
 ```
 
 #### Payment QR Code
+
 ```typescript
 const paymentData = {
   amount: 99.99,
   currency: 'USD',
   description: 'Product purchase',
-  merchantName: 'Example Store'
+  merchantName: 'Example Store',
 };
 
 await qrPrinter.printPaymentQRCode(paymentData, 9);
@@ -703,6 +714,7 @@ See the `example` directory for a complete working example that demonstrates:
 ## 🖨️ Supported Printers
 
 ### Bixolon Thermal Printers
+
 - **SPP-L310** ✅ (Primary target)
 - **SPP-R200III** ✅
 - **SPP-R300** ✅
@@ -711,6 +723,7 @@ See the `example` directory for a complete working example that demonstrates:
 - **SPP-L420** ✅
 
 ### Connection Types
+
 - **Bluetooth** ✅ (Primary)
 - **WiFi** ✅ (Limited support)
 - **USB** ⚠️ (Experimental)
@@ -720,6 +733,7 @@ See the `example` directory for a complete working example that demonstrates:
 ### Common Issues
 
 #### 1. Bluetooth Permissions Not Granted
+
 ```typescript
 // Always check permissions first
 const permissions = await BixolonPrinter.checkBluetoothPermissions();
@@ -732,24 +746,28 @@ if (!permissions.ACCESS_FINE_LOCATION) {
 ```
 
 #### 2. Device Not Found
+
 - Ensure Bluetooth is enabled on both devices
 - Make sure the printer is in pairing mode
 - Check if the device is already paired in system settings
 - Try restarting Bluetooth discovery
 
 #### 3. Connection Fails
+
 - Verify the device MAC address is correct
 - Ensure the printer is compatible with the module
 - Check if another app is connected to the printer
 - Try disconnecting and reconnecting
 
 #### 4. Print Jobs Not Completing
+
 - Check if the printer has paper
 - Verify the printer is not in error state
 - Try printing a simple test first
 - Check printer logs for error messages
 
 #### 5. Module Not Found Error
+
 ```bash
 # Make sure to run prebuild after installation
 npx expo prebuild
@@ -818,6 +836,25 @@ npx expo run:android
 5. **Update documentation** as needed
 6. **Submit a pull request**
 
+### Publishing to NPM
+
+El paquete se publica automáticamente a NPM cuando se crea un release en GitHub:
+
+1. **Update version**: `make update-version VERSION=x.y.z`
+2. **Commit**: `git add . && git commit -m "chore: bump version to x.y.z"`
+3. **Push**: `git push origin main`
+4. **Create GitHub Release**: El CI/CD publicará automáticamente a NPM
+   - Requiere secret `NPM_TOKEN` configurado en GitHub
+
+**Comandos de desarrollo**:
+
+- `make build` - Construye el módulo
+- `make test` - Ejecuta tests
+- `make format` - Formatea código
+- `make verify-format` - Verifica formato (usado en CI)
+- `make publish-dry-run` - Simula publicación
+- `make publish` - Publica manualmente (requiere `npm login`)
+
 ### Code Style
 
 - Use TypeScript for all new code
@@ -847,13 +884,14 @@ When reporting issues, please include:
 **Printer Model**: SPP-L310
 **Android Version**: 12
 **Expo SDK Version**: 53
-**Steps to Reproduce**: 
+**Steps to Reproduce**:
+
 1. Initialize printer
 2. Connect to device
 3. Print text
-**Expected Behavior**: Text should print
-**Actual Behavior**: Connection fails
-**Logs**: [Include relevant logs]
+   **Expected Behavior**: Text should print
+   **Actual Behavior**: Connection fails
+   **Logs**: [Include relevant logs]
 ```
 
 ## 🎯 Roadmap
