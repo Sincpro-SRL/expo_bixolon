@@ -77,23 +77,67 @@ import sincpro.expo.printer.service.PrintService
  */
 class PrinterModule : Module() {
     // DEPENDENCY INJECTION
-
-    // Infrastructure - Android wrappers
-    private lateinit var bluetoothProvider: AndroidBluetoothProvider
-    private lateinit var permissionService: PermissionService
-    private lateinit var eventBus: EventBus
-    private lateinit var orchestrator: PrintJobOrchestrator
-
-    // Adapter - Printer implementation
-    private lateinit var printerAdapter: BixolonPrinterAdapter
-
-    // Services - Business logic
-    private lateinit var connectivityService: ConnectivityService
-    private lateinit var printService: PrintService
-    private lateinit var lowLevelService: LowLevelPrintService
+    // Using lazy initialization to avoid lateinit crashes and ensure proper initialization
 
     // Coroutine scope for async operations
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    // Context - initialized in OnCreate
+    private var context: Context? = null
+
+    // Infrastructure - Android wrappers
+    private val bluetoothProvider by lazy {
+        AndroidBluetoothProvider(requireContext())
+    }
+
+    private val permissionService by lazy {
+        PermissionService(requireContext())
+    }
+
+    private val eventBus by lazy {
+        EventBus()
+    }
+
+    // Adapter - Printer implementation
+    private val printerAdapter by lazy {
+        BixolonPrinterAdapter(requireContext())
+    }
+
+    // Infrastructure - Orchestration (depends on adapter and eventBus)
+    private val orchestrator by lazy {
+        PrintJobOrchestrator(printerAdapter, eventBus)
+    }
+
+    // Services - Business logic
+    private val connectivityService by lazy {
+        ConnectivityService(
+            bluetoothProvider = bluetoothProvider,
+            eventBus = eventBus,
+            printerAdapter = printerAdapter,
+        )
+    }
+
+    private val printService by lazy {
+        PrintService(
+            printerAdapter = printerAdapter,
+            orchestrator = orchestrator,
+            eventBus = eventBus,
+        )
+    }
+
+    private val lowLevelService by lazy {
+        LowLevelPrintService(
+            printerAdapter = printerAdapter,
+            orchestrator = orchestrator,
+            eventBus = eventBus,
+        )
+    }
+
+    /**
+     * Get context with null check
+     */
+    private fun requireContext(): Context =
+        context ?: throw IllegalStateException("Module not initialized - OnCreate not called yet")
 
     // MODULE DEFINITION
 
@@ -111,8 +155,9 @@ class PrinterModule : Module() {
             )
 
             OnCreate {
-                val context = appContext.reactContext as Context
-                initializeDependencies(context)
+                // Store context for lazy initialization
+                context = appContext.reactContext as Context
+                // Start event forwarding
                 startEventForwarding()
                 Log.d(this::class.simpleName, "✅ PrinterModule initialized")
             }
@@ -120,6 +165,7 @@ class PrinterModule : Module() {
             OnDestroy {
                 orchestrator.shutdown()
                 scope.cancel()
+                context = null
                 Log.d(this::class.simpleName, "✅ PrinterModule destroyed")
             }
 
@@ -275,69 +321,57 @@ class PrinterModule : Module() {
             // PRINT API (High Level)
 
             AsyncFunction("printReceipt") { receiptData: Map<String, Any?> ->
-                scope.launch {
-                    try {
-                        val receipt = parseReceipt(receiptData)
-                        val mediaConfig = parseMediaConfig(receiptData["mediaConfig"] as? Map<String, Any?>)
-                        val copies = (receiptData["copies"] as? Number)?.toInt() ?: 1
+                try {
+                    val receipt = parseReceipt(receiptData)
+                    val mediaConfig = parseMediaConfig(receiptData["mediaConfig"] as? Map<String, Any?>)
+                    val copies = (receiptData["copies"] as? Number)?.toInt() ?: 1
 
-                        printService.printReceipt(receipt, mediaConfig, copies).getOrThrow()
-                        Log.d(this::class.simpleName, "✅ Receipt printed")
-                    } catch (e: Exception) {
-                        Log.e(this::class.simpleName, "❌ Print receipt failed", e)
-                        throw e
-                    }
+                    printService.printReceipt(receipt, mediaConfig, copies).getOrThrow()
+                    Log.d(this::class.simpleName, "✅ Receipt printed")
+                } catch (e: Exception) {
+                    Log.e(this::class.simpleName, "❌ Print receipt failed", e)
+                    throw e
                 }
             }
 
             AsyncFunction("printLines") { linesData: List<Map<String, Any?>>, mediaConfigData: Map<String, Any?>? ->
-                scope.launch {
-                    try {
-                        val lines = linesData.map { parseReceiptLine(it) }
-                        val mediaConfig = parseMediaConfig(mediaConfigData)
+                try {
+                    val lines = linesData.map { parseReceiptLine(it) }
+                    val mediaConfig = parseMediaConfig(mediaConfigData)
 
-                        printService.printLines(lines, mediaConfig).getOrThrow()
-                        Log.d(this::class.simpleName, "✅ Lines printed")
-                    } catch (e: Exception) {
-                        Log.e(this::class.simpleName, "❌ Print lines failed", e)
-                        throw e
-                    }
+                    printService.printLines(lines, mediaConfig).getOrThrow()
+                    Log.d(this::class.simpleName, "✅ Lines printed")
+                } catch (e: Exception) {
+                    Log.e(this::class.simpleName, "❌ Print lines failed", e)
+                    throw e
                 }
             }
 
             AsyncFunction("printQRCode") { data: String, size: Int ->
-                scope.launch {
-                    try {
-                        printService.printQRCode(data, size).getOrThrow()
-                        Log.d(this::class.simpleName, "✅ QR code printed")
-                    } catch (e: Exception) {
-                        Log.e(this::class.simpleName, "❌ Print QR code failed", e)
-                        throw e
-                    }
+                try {
+                    printService.printQRCode(data, size).getOrThrow()
+                    Log.d(this::class.simpleName, "✅ QR code printed")
+                } catch (e: Exception) {
+                    Log.e(this::class.simpleName, "❌ Print QR code failed", e)
+                    throw e
                 }
             }
 
             AsyncFunction("printText") { text: String, fontSizeStr: String?, alignmentStr: String?, bold: Boolean? ->
-                scope.launch {
-                    try {
-                        val fontSize = parseFontSize(fontSizeStr)
-                        val alignment = parseAlignment(alignmentStr)
+                try {
+                    val fontSize = parseFontSize(fontSizeStr)
+                    val alignment = parseAlignment(alignmentStr)
 
-                        printService.printText(text, fontSize, alignment, bold ?: false).getOrThrow()
-                        Log.d(this::class.simpleName, "✅ Text printed")
-                    } catch (e: Exception) {
-                        Log.e(this::class.simpleName, "❌ Print text failed", e)
-                        throw e
-                    }
+                    printService.printText(text, fontSize, alignment, bold ?: false).getOrThrow()
+                    Log.d(this::class.simpleName, "✅ Text printed")
+                } catch (e: Exception) {
+                    Log.e(this::class.simpleName, "❌ Print text failed", e)
+                    throw e
                 }
             }
         }
 
-    // DEPENDENCY INJECTION SETUP
-
-    private fun initializeDependencies(context: Context) {
-        // 1. Infrastructure (Android wrappers)
-        bluetoothProvider = AndroidBluetoothProvider(context)
+    // PARSERS (JSON → Domain)
         permissionService = PermissionService(context)
         eventBus = EventBus()
 
@@ -361,14 +395,6 @@ class PrinterModule : Module() {
                 orchestrator = orchestrator,
                 eventBus = eventBus,
             )
-
-        lowLevelService =
-            LowLevelPrintService(
-                printerAdapter = printerAdapter,
-                orchestrator = orchestrator,
-                eventBus = eventBus,
-            )
-    }
 
     // PARSERS (JSON → Domain)
 
