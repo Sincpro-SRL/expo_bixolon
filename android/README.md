@@ -7,11 +7,13 @@ Este es un módulo Expo. Los archivos de configuración de Gradle no están incl
 Crea estos archivos **localmente** (ya están en .gitignore):
 
 **1. `settings.gradle`:**
+
 ```gradle
 rootProject.name = "SincproPrinter"
 ```
 
 **2. `gradle.properties`:**
+
 ```properties
 org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
 android.useAndroidX=true
@@ -20,6 +22,7 @@ android.nonTransitiveRClass=true
 ```
 
 **3. Abrir Android Studio:**
+
 ```bash
 open -a "Android Studio" .
 ```
