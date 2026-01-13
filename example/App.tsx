@@ -40,10 +40,11 @@ export default function App() {
     try {
       const permissions = await BixolonPrinter.checkBluetoothPermissions();
       console.log('Current permissions:', permissions);
-      
-      const locationGranted = permissions.ACCESS_FINE_LOCATION || permissions.ACCESS_COARSE_LOCATION;
+
+      const locationGranted =
+        permissions.ACCESS_FINE_LOCATION || permissions.ACCESS_COARSE_LOCATION;
       setPermissionsGranted(locationGranted);
-      
+
       if (!locationGranted) {
         console.log('Location permissions are not granted');
       } else {
@@ -58,18 +59,21 @@ export default function App() {
   const requestPermissions = async () => {
     try {
       console.log('Requesting Bluetooth permissions...');
-      
+
       const success = await BixolonPrinter.requestBluetoothPermissions();
       if (success) {
         console.log('Permission request completed');
-        
+
         Alert.alert(
-          'Permissions', 
+          'Permissions',
           'Permission dialogs have been shown. Please grant the necessary permissions and then tap "Check Permissions" or try connecting again.',
           [
-            { text: 'OK', onPress: () => {
-              setTimeout(checkPermissions, 2000);
-            }}
+            {
+              text: 'OK',
+              onPress: () => {
+                setTimeout(checkPermissions, 2000);
+              },
+            },
           ]
         );
       } else {
@@ -78,11 +82,9 @@ export default function App() {
     } catch (error) {
       console.error('Error requesting permissions:', error);
       Alert.alert(
-        'Permission Request Failed', 
+        'Permission Request Failed',
         'Could not request permissions. Please enable Bluetooth and Location permissions manually in your device settings.',
-        [
-          { text: 'OK', onPress: checkPermissions }
-        ]
+        [{ text: 'OK', onPress: checkPermissions }]
       );
     }
   };
@@ -127,7 +129,7 @@ FECHA: ${new Date().toLocaleDateString()}
 HORA: ${new Date().toLocaleTimeString()}
 ========================
 Expo Bixolon Module - Test completado`;
-      
+
       const success = await BixolonPrinter.printTextInPages(testText);
       if (success) {
         Alert.alert('Success', 'Test print completed');
@@ -145,12 +147,12 @@ Expo Bixolon Module - Test completado`;
       const currentDate = new Date().toLocaleDateString();
       const currentTime = new Date().toLocaleTimeString();
       const invoiceNumber = Math.floor(Math.random() * 10000);
-      
+
       const items = [
-        { description: 'Product 1', quantity: 2, price: 10.50 },
-        { description: 'Product 2', quantity: 1, price: 25.00 },
+        { description: 'Product 1', quantity: 2, price: 10.5 },
+        { description: 'Product 2', quantity: 1, price: 25.0 },
       ];
-      
+
       let subtotal = 0;
       let invoiceText = `EMPRESA EJEMPLO S.A.
 RUC: 12345678901
@@ -162,7 +164,7 @@ Cliente: Test Customer
 
 `;
 
-      items.forEach(item => {
+      items.forEach((item) => {
         const itemTotal = item.quantity * item.price;
         subtotal += itemTotal;
         invoiceText += `${item.description}
@@ -196,7 +198,7 @@ GRACIAS POR SU COMPRA!`;
     try {
       const qrContent = 'https://www.example.com';
       const qrSize = 2;
-      
+
       const success = await BixolonPrinter.printQRCode(qrContent, qrSize);
       if (success) {
         Alert.alert('Success', 'QR Code printed successfully');
@@ -236,7 +238,9 @@ GRACIAS POR SU COMPRA!`;
           </View>
           <View style={styles.statusItem}>
             <Text style={styles.statusLabel}>Permissions:</Text>
-            <Text style={[styles.statusValue, { color: permissionsGranted ? '#4CAF50' : '#F44336' }]}>
+            <Text
+              style={[styles.statusValue, { color: permissionsGranted ? '#4CAF50' : '#F44336' }]}
+            >
               {permissionsGranted ? '✅ Granted' : '❌ Not Granted'}
             </Text>
           </View>
@@ -256,7 +260,7 @@ GRACIAS POR SU COMPRA!`;
 
         <View style={styles.actionsContainer}>
           <Text style={styles.sectionTitle}>Actions</Text>
-          
+
           {!permissionsGranted && (
             <>
               <TouchableOpacity
@@ -265,7 +269,7 @@ GRACIAS POR SU COMPRA!`;
               >
                 <Text style={styles.actionButtonText}>Request Bluetooth Permissions</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: '#9C27B0' }]}
                 onPress={checkPermissions}
@@ -274,7 +278,7 @@ GRACIAS POR SU COMPRA!`;
               </TouchableOpacity>
             </>
           )}
-          
+
           {!isConnected ? (
             <TouchableOpacity
               style={[styles.actionButton, { opacity: permissionsGranted ? 1 : 0.5 }]}
@@ -285,20 +289,14 @@ GRACIAS POR SU COMPRA!`;
             </TouchableOpacity>
           ) : (
             <>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={handleTestPrint}
-              >
+              <TouchableOpacity style={styles.actionButton} onPress={handleTestPrint}>
                 <Text style={styles.actionButtonText}>Print Test Text</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={handlePrintInvoice}
-              >
+
+              <TouchableOpacity style={styles.actionButton} onPress={handlePrintInvoice}>
                 <Text style={styles.actionButtonText}>Print Sample Invoice</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
                 onPress={handlePrintQRCode}
@@ -318,7 +316,8 @@ GRACIAS POR SU COMPRA!`;
         <View style={styles.infoContainer}>
           <Text style={styles.sectionTitle}>Information</Text>
           <Text style={styles.infoText}>
-            This demo shows how to use the Expo Bixolon module to connect to and control Bixolon printers.
+            This demo shows how to use the Expo Bixolon module to connect to and control Bixolon
+            printers.
           </Text>
           <Text style={styles.infoText}>
             The module supports Bluetooth connectivity and basic printing operations.

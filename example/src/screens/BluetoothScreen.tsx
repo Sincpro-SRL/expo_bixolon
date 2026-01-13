@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  Text,
-  SafeAreaView,
-} from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity, Text, SafeAreaView } from 'react-native';
 import BluetoothDeviceList from '../components/BluetoothDeviceList';
 import PermissionStatus from '../components/PermissionStatus';
 import { BixolonPrinter, BluetoothDevice, BluetoothPermissions } from 'expo-bixolon';
@@ -16,10 +9,7 @@ interface BluetoothScreenProps {
   onBack: () => void;
 }
 
-const BluetoothScreen: React.FC<BluetoothScreenProps> = ({
-  onDeviceSelected,
-  onBack,
-}) => {
+const BluetoothScreen: React.FC<BluetoothScreenProps> = ({ onDeviceSelected, onBack }) => {
   const [devices, setDevices] = useState<BluetoothDevice[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBluetoothEnabled, setIsBluetoothEnabled] = useState(false);
@@ -33,19 +23,15 @@ const BluetoothScreen: React.FC<BluetoothScreenProps> = ({
     try {
       const enabled = await BixolonPrinter.isBluetoothEnabled();
       setIsBluetoothEnabled(enabled);
-      
+
       if (enabled) {
         // Check permissions before loading devices
         await checkAndRequestPermissions();
       } else {
-        Alert.alert(
-          'Bluetooth Disabled',
-          'Please enable Bluetooth to discover devices.',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Settings', onPress: () => {} }, // Could open Bluetooth settings
-          ]
-        );
+        Alert.alert('Bluetooth Disabled', 'Please enable Bluetooth to discover devices.', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Settings', onPress: () => {} }, // Could open Bluetooth settings
+        ]);
       }
     } catch (error) {
       console.error('Error checking Bluetooth status:', error);
@@ -58,10 +44,10 @@ const BluetoothScreen: React.FC<BluetoothScreenProps> = ({
       const currentPermissions = await BixolonPrinter.checkBluetoothPermissions();
       console.log('Current permissions:', currentPermissions);
       setPermissions(currentPermissions);
-      
+
       // Check if all required permissions are granted
-      const hasAllPermissions = Object.values(currentPermissions).every(granted => granted);
-      
+      const hasAllPermissions = Object.values(currentPermissions).every((granted) => granted);
+
       if (hasAllPermissions) {
         loadDevices();
       } else {
@@ -106,21 +92,17 @@ const BluetoothScreen: React.FC<BluetoothScreenProps> = ({
   const handleDeviceSelect = async (device: BluetoothDevice) => {
     try {
       console.log(`Selected device: ${device.name} (${device.address})`);
-      
+
       // Show confirmation dialog
-      Alert.alert(
-        'Connect to Device',
-        `Do you want to connect to "${device.name}"?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Connect',
-            onPress: () => {
-              onDeviceSelected(device);
-            },
+      Alert.alert('Connect to Device', `Do you want to connect to "${device.name}"?`, [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Connect',
+          onPress: () => {
+            onDeviceSelected(device);
           },
-        ]
-      );
+        },
+      ]);
     } catch (error) {
       console.error('Error selecting device:', error);
       Alert.alert('Error', 'Failed to select device');
@@ -139,7 +121,7 @@ const BluetoothScreen: React.FC<BluetoothScreenProps> = ({
     try {
       await BixolonPrinter.startBluetoothDiscovery();
       Alert.alert('Discovery Started', 'Searching for new devices...');
-      
+
       // Stop discovery after 10 seconds
       setTimeout(async () => {
         try {
@@ -178,7 +160,7 @@ const BluetoothScreen: React.FC<BluetoothScreenProps> = ({
           onRequestPermissions={checkAndRequestPermissions}
         />
       )}
-      
+
       <BluetoothDeviceList
         devices={devices}
         onDeviceSelect={handleDeviceSelect}
