@@ -22,13 +22,28 @@ verify-format: format
 
 test:
 	@echo "Running tests..."
-	@npm test || echo "No tests configured yet"
+
+# ============================================================================
+# Build - Single command that builds everything and syncs artifacts
+# ============================================================================
+
+SDK_DIR := sincpro-printer-sdk
+SDK_AAR := $(SDK_DIR)/build/outputs/aar/sincpro-printer-sdk-release.aar
+SDK_LIBS := $(SDK_DIR)/libs
+TEST_APP_LIBS := sincpro-printer-test-app/app/libs
 
 build:
-	@echo "Building project..."
-	@npm run clean || true
-	@npm run build
-	@echo "✓ Build completed successfully"
+	@echo "🔨 Building sincpro-printer-sdk..."
+	@cd $(SDK_DIR) && ./gradlew assembleRelease --quiet
+	@echo "📦 Syncing artifacts to sincpro-printer-test-app..."
+	@mkdir -p $(TEST_APP_LIBS)/bixolon
+	@cp $(SDK_AAR) $(TEST_APP_LIBS)/sincpro-printer-sdk.aar
+	@cp $(SDK_LIBS)/*.jar $(TEST_APP_LIBS)/bixolon/
+	@cp $(SDK_LIBS)/pdf/*.aar $(TEST_APP_LIBS)/bixolon/ 2>/dev/null || true
+	@echo "✓ Build complete:"
+	@echo "  → $(TEST_APP_LIBS)/sincpro-printer-sdk.aar"
+	@echo "  → $(TEST_APP_LIBS)/bixolon/*.jar"
+	@echo "  → $(TEST_APP_LIBS)/bixolon/*.aar (PDF support)"
 
 update-version:
 ifndef VERSION
@@ -67,6 +82,9 @@ clean:
 	@npm run clean || true
 	@rm -rf node_modules build
 	@cd android && rm -rf .gradle build .idea || true
+	@rm -rf $(SDK_DIR)/.gradle $(SDK_DIR)/build
+	@rm -rf test/.gradle test/build test/app/build
+	@rm -rf $(TEST_APP_LIBS)/*.aar
 
 
-.PHONY: prepare-environment init format verify-format test build update-version publish deploy clean clean-android android-env
+.PHONY: prepare-environment init format verify-format test build update-version publish deploy clean

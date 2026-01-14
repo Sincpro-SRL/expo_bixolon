@@ -1,6 +1,2 @@
 include ':app'
 //include ':Bixolon_pdf'
-
-// Incluir el módulo de impresora (sin entrypoint de Expo)
-include ':printer-core'
-project(':printer-core').projectDir = new File(rootProject.projectDir, '../../android')

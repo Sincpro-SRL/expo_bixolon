@@ -35,18 +35,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        
-        <!-- ✅ Tu Activity de prueba (aparece primero en el launcher) -->
-        <activity
-            android:name=".MyPrinterTestActivity"
-            android:exported="true"
-            android:label="🧪 Test Mi Código">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        
         <activity
             android:name=".WlanSettingActivity"
             android:exported="true" />

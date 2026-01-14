@@ -1,5 +1,6 @@
 package com.sincpro.printer.infrastructure
 
+import com.sincpro.printer.adapter.BixolonPrinterAdapter
 import com.sincpro.printer.domain.IPrinter
 import com.sincpro.printer.domain.MediaConfig
 import kotlinx.coroutines.sync.Mutex
@@ -27,6 +28,11 @@ class PrintSessionManager(private val printer: IPrinter) {
     }
 
     fun isLocked(): Boolean = sessionMutex.isLocked
+    
+    /**
+     * Get the printer adapter for direct access (PDF, advanced features)
+     */
+    fun getPrinterAdapter(): BixolonPrinterAdapter? = printer as? BixolonPrinterAdapter
 }
 
 class PrintSession(private val printer: IPrinter, private val media: MediaConfig) {
