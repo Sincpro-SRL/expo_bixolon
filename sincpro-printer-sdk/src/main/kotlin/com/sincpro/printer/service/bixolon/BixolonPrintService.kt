@@ -8,6 +8,7 @@ import com.sincpro.printer.domain.IPrinter
 import com.sincpro.printer.domain.MediaConfig
 import com.sincpro.printer.domain.PrintElement
 import com.sincpro.printer.domain.Receipt
+import com.sincpro.printer.domain.ReceiptLine
 import com.sincpro.printer.domain.TextStyle
 import com.sincpro.printer.infrastructure.BinaryConverter
 import com.sincpro.printer.infrastructure.PdfRenderer
@@ -114,6 +115,42 @@ class BixolonPrintService(private val printer: IPrinter) {
     ): Result<Unit> {
         val text = "$key $value"
         return printText(text, fontSize, Alignment.LEFT, bold, media)
+    }
+
+    /**
+     * Print a row with multiple columns
+     * 
+     * Example - Two columns (label + value):
+     * ```
+     * printColumns(
+     *     ReceiptLine.Column("nombre:", 0.4f),
+     *     ReceiptLine.Column("Andres Gutierrez", 0.6f)
+     * )
+     * // Output: nombre:              Andres Gutierrez
+     * ```
+     * 
+     * Example - Three columns:
+     * ```
+     * printColumns(
+     *     ReceiptLine.Column("Item", 0.5f),
+     *     ReceiptLine.Column("Qty", 0.2f, Alignment.CENTER),
+     *     ReceiptLine.Column("$99.99", 0.3f, Alignment.RIGHT)
+     * )
+     * ```
+     */
+    suspend fun printColumns(
+        vararg columns: ReceiptLine.Column,
+        fontSize: FontSize = FontSize.MEDIUM,
+        bold: Boolean = false,
+        media: MediaConfig = MediaConfig.continuous80mm()
+    ): Result<Unit> {
+        val line = ReceiptLine.Columns(columns.toList(), fontSize, bold)
+        val (element, _) = line.toElement(20, media.widthDots)
+        return if (element != null) {
+            printer.print(listOf(element), media)
+        } else {
+            Result.failure(Exception("Failed to create columns element"))
+        }
     }
 
     fun getPdfPageCount(base64Data: String): Int {

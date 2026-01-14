@@ -114,6 +114,61 @@ sealed class ReceiptLine {
         }
     }
 
+    /**
+     * Row with multiple columns - each column has text and relative width
+     * Example:
+     * ```
+     * Columns(
+     *     Column("nombre:", 0.3f),      // 30% width
+     *     Column("Andres Gutierrez", 0.7f)  // 70% width
+     * )
+     * ```
+     * Or with alignment:
+     * ```
+     * Columns(
+     *     Column("Total:", 0.6f, Alignment.LEFT),
+     *     Column("$99.99", 0.4f, Alignment.RIGHT)
+     * )
+     * ```
+     */
+    data class Columns(
+        val columns: List<Column>,
+        val fontSize: FontSize = FontSize.MEDIUM,
+        val bold: Boolean = false
+    ) : ReceiptLine() {
+        constructor(vararg cols: Column, fontSize: FontSize = FontSize.MEDIUM, bold: Boolean = false) 
+            : this(cols.toList(), fontSize, bold)
+
+        override fun toElement(y: Int, mediaWidth: Int): Pair<PrintElement?, Int> {
+            // Build padded string for single-line print
+            val totalChars = when (fontSize) {
+                FontSize.SMALL -> 64
+                FontSize.MEDIUM -> 48
+                FontSize.LARGE -> 32
+                FontSize.XLARGE -> 24
+            }
+            
+            val sb = StringBuilder()
+            columns.forEach { col ->
+                val colChars = (totalChars * col.widthRatio).toInt()
+                val text = when (col.alignment) {
+                    Alignment.LEFT -> col.text.padEnd(colChars)
+                    Alignment.CENTER -> col.text.padStart((colChars + col.text.length) / 2).padEnd(colChars)
+                    Alignment.RIGHT -> col.text.padStart(colChars)
+                }
+                sb.append(text.take(colChars))
+            }
+            
+            return PrintElement.Text(sb.toString(), 10, y, TextStyle(fontSize, bold)) to 30
+        }
+    }
+
+    data class Column(
+        val text: String,
+        val widthRatio: Float = 0.5f,
+        val alignment: Alignment = Alignment.LEFT
+    )
+
     companion object {
         fun calculateX(alignment: Alignment, width: Int, contentWidth: Int): Int = when (alignment) {
             Alignment.LEFT -> 10
