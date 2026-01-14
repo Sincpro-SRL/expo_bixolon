@@ -42,10 +42,9 @@ android {
 
 dependencies {
     // ====== Sincpro Printer SDK (synced via `make build`) ======
+    // SDK embebe Bixolon JARs + jniLibs, solo necesita el PDF AAR separado
     implementation(files("libs/sincpro-printer-sdk.aar"))
-    implementation(files("libs/bixolon/BixolonLabelPrinterLibrary_V2.1.1.jar"))
-    implementation(files("libs/bixolon/libcommon_V1.4.2.jar"))
-    implementation(files("libs/bixolon/Bixolon_pdf.aar"))
+    implementation(files("libs/Bixolon_pdf.aar"))
     
     // Coroutines (required by SDK)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

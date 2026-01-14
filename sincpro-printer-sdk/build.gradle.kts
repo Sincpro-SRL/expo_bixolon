@@ -35,9 +35,8 @@ android {
 }
 
 dependencies {
-    // Bixolon SDK - compileOnly para que NO se empaqueten en el AAR
-    // El consumidor debe proveer estos JARs
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    // Bixolon SDK - embebido en el AAR para que el consumidor solo necesite el AAR
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     
     // Coroutines - api para que el consumidor las tenga transitivamente
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")

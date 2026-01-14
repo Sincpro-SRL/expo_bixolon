@@ -32,12 +32,10 @@ android {
 }
 
 dependencies {
-  // Sincpro Printer SDK
+  // Sincpro Printer SDK (incluye Bixolon JARs + jniLibs embebidos)
   implementation files('libs/sincpro-printer-sdk.aar')
   
-  // Bixolon SDK dependencies (required by sincpro-printer-sdk)
-  implementation files('libs/BixolonLabelPrinterLibrary_V2.1.1.jar')
-  implementation files('libs/libcommon_V1.4.2.jar')
+  // Bixolon PDF support (AAR no puede embeber otro AAR)
   implementation files('libs/pdf/Bixolon_pdf.aar')
 
   // Expo modules (provided by host app)

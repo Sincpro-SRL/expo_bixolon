@@ -37,21 +37,21 @@ build:
 	@echo "🔨 Building sincpro-printer-sdk..."
 	@cd $(SDK_DIR) && ./gradlew assembleRelease --quiet
 	@echo "📦 Syncing artifacts to sincpro-printer-test-app..."
-	@mkdir -p $(TEST_APP_LIBS)/bixolon
+	@mkdir -p $(TEST_APP_LIBS)
+	@rm -rf $(TEST_APP_LIBS)/bixolon 2>/dev/null || true
+	@rm -f $(TEST_APP_LIBS)/sincpro-printer-sdk-release.aar 2>/dev/null || true
 	@cp $(SDK_AAR) $(TEST_APP_LIBS)/sincpro-printer-sdk.aar
-	@cp $(SDK_LIBS)/*.jar $(TEST_APP_LIBS)/bixolon/
-	@cp $(SDK_LIBS)/pdf/*.aar $(TEST_APP_LIBS)/bixolon/ 2>/dev/null || true
+	@cp $(SDK_LIBS)/pdf/*.aar $(TEST_APP_LIBS)/ 2>/dev/null || true
 	@echo "📦 Syncing artifacts to expo module (android/libs)..."
 	@mkdir -p $(EXPO_MODULE_LIBS)/pdf
 	@cp $(SDK_AAR) $(EXPO_MODULE_LIBS)/sincpro-printer-sdk.aar
-	@cp $(SDK_LIBS)/*.jar $(EXPO_MODULE_LIBS)/
 	@cp $(SDK_LIBS)/pdf/*.aar $(EXPO_MODULE_LIBS)/pdf/ 2>/dev/null || true
+	@rm -f $(EXPO_MODULE_LIBS)/*.jar 2>/dev/null || true
 	@echo "✓ Build complete:"
-	@echo "  → $(TEST_APP_LIBS)/sincpro-printer-sdk.aar"
-	@echo "  → $(TEST_APP_LIBS)/bixolon/*"
-	@echo "  → $(EXPO_MODULE_LIBS)/sincpro-printer-sdk.aar"
-	@echo "  → $(EXPO_MODULE_LIBS)/*.jar"
-	@echo "  → $(EXPO_MODULE_LIBS)/pdf/*.aar"
+	@echo "  → $(TEST_APP_LIBS)/sincpro-printer-sdk.aar (includes JARs)"
+	@echo "  → $(TEST_APP_LIBS)/Bixolon_pdf.aar"
+	@echo "  → $(EXPO_MODULE_LIBS)/sincpro-printer-sdk.aar (includes JARs)"
+	@echo "  → $(EXPO_MODULE_LIBS)/pdf/Bixolon_pdf.aar"
 
 update-version:
 ifndef VERSION
