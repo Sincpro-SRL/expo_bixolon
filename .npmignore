@@ -29,8 +29,13 @@ node_modules/
 tsconfig.json
 Makefile
 
-# Exclude source files (we publish the build folder)
+# Exclude source TypeScript (we publish transpiled build/)
 /src/
+
+# Exclude SDK source and test-app
+/sincpro-printer-sdk/
+/sincpro-printer-test-app/
+/vendor/
 
 # Keep these files/folders for publication
 !/build/
