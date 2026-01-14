@@ -12,7 +12,7 @@ class BixolonConnectivityService(
     private val printer: IPrinter,
     private val bluetooth: IBluetooth
 ) {
-    private var defaultConfig: PrinterConfig = PrinterConfig.DEFAULT_80MM_RECEIPT
+    private var defaultConfig: PrinterConfig = PrinterConfig.DEFAULT
 
     suspend fun connectBluetooth(
         address: String,
@@ -42,9 +42,7 @@ class BixolonConnectivityService(
         defaultConfig = config
     }
 
-    suspend fun disconnect(): Result<Unit> {
-        return printer.disconnect()
-    }
+    suspend fun disconnect(): Result<Unit> = printer.disconnect()
 
     fun isConnected(): Boolean = printer.isConnected()
 

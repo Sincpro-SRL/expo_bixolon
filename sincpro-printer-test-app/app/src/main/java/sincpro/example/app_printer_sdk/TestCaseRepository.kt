@@ -625,8 +625,8 @@ class TestCaseRepository(
 
         TestCase(
             id = "config_04",
-            name = "Low Level - Print Image",
-            description = "Print a test pattern image using low-level API",
+            name = "Print Image - Test Pattern",
+            description = "Print a test pattern image",
             category = TestCategory.CONFIGURATION
         ) {
             // Create a simple test pattern bitmap
@@ -647,16 +647,14 @@ class TestCaseRepository(
             paint.color = android.graphics.Color.WHITE  
             canvas.drawRect(20f, 30f, 180f, 70f, paint)
             
-            // Print using low-level API
-            sdk.bixolon.lowLevel.begin()
-            sdk.bixolon.lowLevel.bitmap(bitmap, 50, 50)
-            sdk.bixolon.lowLevel.end()
+            // Print using printImage API
+            sdk.bixolon.print.printImage(bitmap, Alignment.CENTER)
         },
 
         TestCase(
             id = "config_05",
-            name = "Low Level - Print Image Advanced",
-            description = "Print image with custom brightness and dithering",
+            name = "Print Image - Gradient",
+            description = "Print gradient test pattern",
             category = TestCategory.CONFIGURATION
         ) {
             // Create a gradient test pattern
@@ -673,13 +671,7 @@ class TestCaseRepository(
                 canvas.drawLine(x.toFloat(), 0f, x.toFloat(), height.toFloat(), paint)
             }
             
-            sdk.bixolon.lowLevel.begin()
-            sdk.bixolon.lowLevel.bitmap(
-                image = bitmap,
-                x = 50,
-                y = 50
-            )
-            sdk.bixolon.lowLevel.end()
+            sdk.bixolon.print.printImage(bitmap, Alignment.LEFT)
         }
     )
 
@@ -691,7 +683,7 @@ class TestCaseRepository(
         // Test that decodes PNG manually like config_04/05 do (they work!)
         TestCase(
             id = "binary_00",
-            name = "Print PNG - Manual Decode (like config_04)",
+            name = "Print PNG - Manual Decode",
             description = "Decode PNG manually and draw on white canvas",
             category = TestCategory.PRINT_IMAGE
         ) {
@@ -724,10 +716,8 @@ class TestCaseRepository(
             
             android.util.Log.d("TEST", "Print bitmap: ${printBitmap.width}x${printBitmap.height}, config=${printBitmap.config}")
             
-            // Print using same method as config_04
-            sdk.bixolon.lowLevel.begin()
-            sdk.bixolon.lowLevel.bitmap(printBitmap, 50, 0)
-            sdk.bixolon.lowLevel.end()
+            // Print using printImage API
+            sdk.bixolon.print.printImage(printBitmap, Alignment.CENTER)
         },
 
         TestCase(
@@ -767,22 +757,16 @@ class TestCaseRepository(
 
         TestCase(
             id = "binary_03",
-            name = "Print PNG - Custom Width (Low Level)",
-            description = "Print PNG scaled to 200 dots width using low-level API",
+            name = "Print PNG - Right Aligned",
+            description = "Print PNG image aligned to right",
             category = TestCategory.PRINT_IMAGE
         ) {
             val base64 = readRawResourceAsBase64(R.raw.sincpro_simbolo)
             if (base64 != null) {
-                sdk.bixolon.lowLevel.begin()
-                sdk.bixolon.lowLevel.bitmapBase64(
+                sdk.bixolon.print.printImageBase64(
                     base64Data = base64,
-                    x = 50,
-                    y = 0,
-                    width = 200,
-                    brightness = 50,
-                    dithering = true
+                    alignment = Alignment.RIGHT
                 )
-                sdk.bixolon.lowLevel.end()
             } else {
                 Result.failure(Exception("Failed to read PNG resource"))
             }
@@ -799,7 +783,7 @@ class TestCaseRepository(
                 println("PDF loaded, base64 length: ${base64.length}")
                 
                 // Get page count first
-                val pageCount = sdk.bixolon.lowLevel.getPdfPageCountBase64(base64)
+                val pageCount = sdk.bixolon.print.getPdfPageCount(base64)
                 println("PDF has $pageCount pages")
                 
                 sdk.bixolon.print.printPdfBase64(
@@ -819,7 +803,7 @@ class TestCaseRepository(
         ) {
             val base64 = readRawResourceAsBase64(R.raw.comprobante_1767994755165)
             if (base64 != null) {
-                val pageCount = sdk.bixolon.lowLevel.getPdfPageCountBase64(base64)
+                val pageCount = sdk.bixolon.print.getPdfPageCount(base64)
                 println("Printing all $pageCount pages...")
                 
                 var lastResult: Result<Unit> = Result.success(Unit)
@@ -839,23 +823,22 @@ class TestCaseRepository(
 
         TestCase(
             id = "binary_06",
-            name = "Print PDF - Low Level",
-            description = "Print PDF using low-level API with custom settings",
+            name = "Print PDF - Page 2",
+            description = "Print second page of PDF if exists",
             category = TestCategory.PRINT_PDF
         ) {
             val base64 = readRawResourceAsBase64(R.raw.comprobante_1767994755165)
             if (base64 != null) {
-                sdk.bixolon.lowLevel.begin()
-                sdk.bixolon.lowLevel.pdfBase64(
-                    base64Data = base64,
-                    x = 0,
-                    y = 0,
-                    page = 1,
-                    width = 0,  // Auto fit
-                    brightness = 50,
-                    dithering = true
-                )
-                sdk.bixolon.lowLevel.end()
+                val pageCount = sdk.bixolon.print.getPdfPageCount(base64)
+                if (pageCount >= 2) {
+                    sdk.bixolon.print.printPdfBase64(
+                        base64Data = base64,
+                        page = 2
+                    )
+                } else {
+                    println("PDF only has $pageCount page(s), skipping page 2")
+                    Result.success(Unit)
+                }
             } else {
                 Result.failure(Exception("Failed to read PDF resource"))
             }
@@ -863,22 +846,17 @@ class TestCaseRepository(
 
         TestCase(
             id = "binary_07",
-            name = "Print PNG - Low Level",
-            description = "Print PNG using low-level bitmapBase64",
+            name = "Print PNG - 58mm Paper",
+            description = "Print PNG on 58mm paper width",
             category = TestCategory.PRINT_IMAGE
         ) {
             val base64 = readRawResourceAsBase64(R.raw.sincpro_simbolo)
             if (base64 != null) {
-                sdk.bixolon.lowLevel.begin()
-                sdk.bixolon.lowLevel.bitmapBase64(
+                sdk.bixolon.print.printImageBase64(
                     base64Data = base64,
-                    x = 50,
-                    y = 0,
-                    width = 300,
-                    brightness = 50,
-                    dithering = true
+                    alignment = Alignment.CENTER,
+                    media = MediaConfig.continuous58mm()
                 )
-                sdk.bixolon.lowLevel.end()
             } else {
                 Result.failure(Exception("Failed to read PNG resource"))
             }
@@ -908,21 +886,9 @@ class TestCaseRepository(
                 val isPdf = header.startsWith("%PDF")
                 println("Is valid PDF: $isPdf")
                 
-                // Create temp file and check
-                val tempFile = java.io.File.createTempFile("diag_", ".pdf", context.cacheDir)
-                tempFile.writeBytes(bytes)
-                println("Temp file created: ${tempFile.absolutePath}")
-                println("Temp file size: ${tempFile.length()} bytes")
-                println("Temp file exists: ${tempFile.exists()}")
-                
                 // Try to get page count
-                val uri = android.net.Uri.fromFile(tempFile)
-                println("URI: $uri")
-                
-                val pageCount = sdk.bixolon.lowLevel.getPdfPageCountBase64(base64)
+                val pageCount = sdk.bixolon.print.getPdfPageCount(base64)
                 println("Page count: $pageCount")
-                
-                tempFile.delete()
                 
                 if (isPdf && pageCount > 0) {
                     println("=== PDF looks valid! ===")

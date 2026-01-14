@@ -4,9 +4,7 @@ import android.content.Context
 import com.sincpro.printer.adapter.BixolonPrinterAdapter
 import com.sincpro.printer.domain.IBluetooth
 import com.sincpro.printer.infrastructure.AndroidBluetoothProvider
-import com.sincpro.printer.infrastructure.PrintSessionManager
 import com.sincpro.printer.service.bixolon.BixolonConnectivityService
-import com.sincpro.printer.service.bixolon.BixolonLowLevelService
 import com.sincpro.printer.service.bixolon.BixolonPrintService
 
 class SincproPrinterSdk(context: Context) {
@@ -17,9 +15,8 @@ class SincproPrinterSdk(context: Context) {
 
     class Bixolon(context: Context, bluetooth: IBluetooth) {
         private val adapter = BixolonPrinterAdapter(context)
-        private val sessionManager = PrintSessionManager(adapter)
+
         val connectivity = BixolonConnectivityService(adapter, bluetooth)
-        val print = BixolonPrintService(sessionManager)
-        val lowLevel = BixolonLowLevelService(adapter)
+        val print = BixolonPrintService(adapter)
     }
 }

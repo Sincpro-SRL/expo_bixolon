@@ -7,12 +7,24 @@ data class MediaConfig(
     val gapDots: Int = 0
 ) {
     companion object {
-        fun continuous80mm() = MediaConfig(640, 0, MediaType.CONTINUOUS, 0)
-        fun continuous58mm() = MediaConfig(464, 0, MediaType.CONTINUOUS, 0)
-        fun label(widthMm: Int, heightMm: Int, gapMm: Int = 3): MediaConfig {
-            val dpmm = 8
-            return MediaConfig(widthMm * dpmm, heightMm * dpmm, MediaType.GAP, gapMm * dpmm)
-        }
+        private const val DOTS_PER_MM = 8
+
+        fun continuous80mm() = MediaConfig(640, 0, MediaType.CONTINUOUS)
+        fun continuous58mm() = MediaConfig(464, 0, MediaType.CONTINUOUS)
+
+        fun label(widthMm: Int, heightMm: Int, gapMm: Int = 3) = MediaConfig(
+            widthDots = widthMm * DOTS_PER_MM,
+            heightDots = heightMm * DOTS_PER_MM,
+            type = MediaType.GAP,
+            gapDots = gapMm * DOTS_PER_MM
+        )
+
+        fun blackMark(widthMm: Int, heightMm: Int, markMm: Int = 3) = MediaConfig(
+            widthDots = widthMm * DOTS_PER_MM,
+            heightDots = heightMm * DOTS_PER_MM,
+            type = MediaType.BLACK_MARK,
+            gapDots = markMm * DOTS_PER_MM
+        )
     }
 }
 
