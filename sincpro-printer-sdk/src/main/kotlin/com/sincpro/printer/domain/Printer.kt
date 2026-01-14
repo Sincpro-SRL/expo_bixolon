@@ -10,7 +10,6 @@ interface IPrinter {
     suspend fun configure(config: PrinterConfig): Result<Unit>
     suspend fun getInfo(): Result<PrinterInfo>
     fun getDpi(): Int
-    suspend fun print(receipt: Receipt, media: MediaConfig = MediaConfig.continuous80mm()): Result<Unit>
     suspend fun beginTransaction(media: MediaConfig): Result<Unit>
     suspend fun drawText(text: String, x: Int, y: Int, style: TextStyle): Result<Unit>
     suspend fun drawQR(data: String, x: Int, y: Int, size: Int): Result<Unit>

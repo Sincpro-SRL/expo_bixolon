@@ -19,8 +19,6 @@ import com.sincpro.printer.domain.Orientation
 import com.sincpro.printer.domain.PrinterConfig
 import com.sincpro.printer.domain.PrinterInfo
 import com.sincpro.printer.domain.PrinterStatus
-import com.sincpro.printer.domain.Receipt
-import com.sincpro.printer.domain.ReceiptLine
 import com.sincpro.printer.domain.TextStyle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -294,67 +292,4 @@ class BixolonPrinterAdapter(private val context: Context) : IPrinter {
                 Result.failure(e)
             }
         }
-
-
-    override suspend fun print(receipt: Receipt, media: MediaConfig): Result<Unit> = 
-        withContext(Dispatchers.IO) {
-            try {
-                beginTransaction(media).getOrThrow()
-                var y = 50
-                val allLines = receipt.header + receipt.body + receipt.footer
-                for (line in allLines) {
-                    y = renderLine(line, y, media.widthDots)
-                }
-                endTransaction(1).getOrThrow()
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-
-    private suspend fun renderLine(line: ReceiptLine, y: Int, width: Int): Int {
-        return when (line) {
-            is ReceiptLine.Text -> {
-                val x = calculateX(line.alignment, width, line.content.length * 10)
-                drawText(line.content, x, y, TextStyle(line.fontSize, line.bold, line.alignment))
-                y + 30
-            }
-            is ReceiptLine.KeyValue -> {
-                drawText(line.key, 10, y, TextStyle(line.fontSize, line.bold))
-                drawText(line.value, width - 10 - (line.value.length * 10), y, TextStyle(line.fontSize, line.bold))
-                y + 30
-            }
-            is ReceiptLine.QR -> {
-                val qrWidth = line.size * 20
-                val x = calculateX(line.alignment, width, qrWidth)
-                drawQR(line.data, x, y, line.size)
-                y + qrWidth + 20
-            }
-            is ReceiptLine.Barcode -> {
-                val barcodeWidth = line.data.length * 10
-                val x = calculateX(line.alignment, width, barcodeWidth)
-                drawBarcode(line.data, x, y, line.type, line.width, line.height)
-                y + line.height + 30
-            }
-            is ReceiptLine.Separator -> {
-                val sep = line.char.toString().repeat(line.length)
-                drawText(sep, 10, y, TextStyle(FontSize.SMALL))
-                y + 20
-            }
-            is ReceiptLine.Space -> y + (line.lines * 20)
-            is ReceiptLine.Image -> {
-                val x = calculateX(line.alignment, width, line.bitmap.width)
-                drawBitmap(line.bitmap, x, y)
-                y + line.bitmap.height + 10
-            }
-        }
-    }
-
-    private fun calculateX(alignment: Alignment, width: Int, contentWidth: Int): Int {
-        return when (alignment) {
-            Alignment.LEFT -> 10
-            Alignment.CENTER -> (width - contentWidth) / 2
-            Alignment.RIGHT -> width - contentWidth - 10
-        }
-    }
 }
