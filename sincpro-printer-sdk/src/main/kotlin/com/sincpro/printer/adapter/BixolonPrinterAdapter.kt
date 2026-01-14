@@ -57,7 +57,9 @@ class BixolonPrinterAdapter(private val context: Context) : IPrinter {
 
     private fun Orientation.toBixolonOrientation() = when (this) {
         Orientation.TOP_TO_BOTTOM -> BixolonLabelPrinter.ORIENTATION_TOP_TO_BOTTOM
+        Orientation.LEFT_TO_RIGHT -> BixolonLabelPrinter.ORIENTATION_TOP_TO_BOTTOM
         Orientation.BOTTOM_TO_TOP -> BixolonLabelPrinter.ORIENTATION_BOTTOM_TO_TOP
+        Orientation.RIGHT_TO_LEFT -> BixolonLabelPrinter.ORIENTATION_BOTTOM_TO_TOP
     }
 
 
@@ -210,8 +212,13 @@ class BixolonPrinterAdapter(private val context: Context) : IPrinter {
                     x,
                     y,
                     style.fontSize.toBixolon(),
+                    1,
+                    1,
+                    0,
                     BixolonLabelPrinter.ROTATION_NONE,
+                    false,
                     style.bold,
+                    style.alignment.toBixolonTextAlignment()
                 )
                 Result.success(Unit)
             } catch (e: Exception) {
@@ -300,6 +307,7 @@ class BixolonPrinterAdapter(private val context: Context) : IPrinter {
     }
 
     fun getPdfPageCountBase64(base64Data: String): Int {
+        return 0
     }
 
 
