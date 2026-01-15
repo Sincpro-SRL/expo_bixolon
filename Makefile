@@ -23,6 +23,8 @@ verify-format: format
 test:
 	@echo "Running tests..."
 
+# Get version from package.json
+VERSION := $(shell node -p "require('./package.json').version")
 
 SDK_DIR := sincpro-printer-sdk
 SDK_AAR := $(SDK_DIR)/build/outputs/aar/sincpro-printer-sdk-release.aar
@@ -41,9 +43,9 @@ distribute-app-test:
 	@cp $(SDK_LIBS)/pdf/*.aar $(TEST_APP_LIBS)/ 2>/dev/null || true
 
 distribute-expo-module:
-	@mkdir -p $(EXPO_MODULE_LIBS)/pdf
+	@mkdir -p $(EXPO_MODULE_LIBS)
 	@cp $(SDK_AAR) $(EXPO_MODULE_LIBS)/sincpro-printer-sdk.aar
-	@cp $(SDK_LIBS)/pdf/*.aar $(EXPO_MODULE_LIBS)/pdf/ 2>/dev/null || true
+	@cp $(SDK_LIBS)/pdf/*.aar $(EXPO_MODULE_LIBS)/ 2>/dev/null || true
 	@rm -f $(EXPO_MODULE_LIBS)/*.jar 2>/dev/null || true
 
 
@@ -51,7 +53,19 @@ build: prebuild distribute-app-test distribute-expo-module
 	@npm run build
 
 
-update-version:
+android: build
+	@echo "🚀 Building Android app..."
+	@npx expo run:android
+
+sync-versions:
+	@echo "📌 Syncing version $(VERSION) across gradle files..."
+	@sed -i '' "s/version = '[^']*'/version = '$(VERSION)'/g" android/build.gradle
+	@sed -i '' "s/versionName \"[^\"]*\"/versionName \"$(VERSION)\"/g" android/build.gradle
+	@find sincpro-printer-sdk -name "gradle.properties" -exec sed -i '' "s/version=[^ ]*/version=$(VERSION)/g" {} \;
+	@echo "✓ Versions synced to $(VERSION)"
+
+
+update-version: sync-versions
 ifndef VERSION
 	$(error VERSION is required. Usage: make update-version VERSION=1.2.3)
 endif
@@ -89,4 +103,4 @@ clean:
 	@rm -rf $(TEST_APP_LIBS)/*.aar
 
 
-.PHONY: prepare-environment init format verify-format test prebuild build distribute-app-test distribute-expo-module update-version publish deploy clean
+.PHONY: prepare-environment init format verify-format test prebuild build sync-versions android distribute-app-test distribute-expo-module update-version publish deploy clean

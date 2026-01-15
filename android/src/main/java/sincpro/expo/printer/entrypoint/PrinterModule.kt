@@ -8,6 +8,7 @@ import com.sincpro.printer.domain.FontSize
 import com.sincpro.printer.domain.MediaConfig
 import com.sincpro.printer.domain.Receipt
 import com.sincpro.printer.domain.ReceiptLine
+import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -58,7 +59,7 @@ class PrinterModule : Module() {
             // CONNECTION API
             // ============================================================
 
-            AsyncFunction("connectBluetooth") { address: String, timeoutMs: Double? ->
+            AsyncFunction("connectBluetooth") Coroutine { address: String, timeoutMs: Double? ->
                 sdk.bixolon.connectivity
                     .connectBluetooth(
                         address = address,
@@ -66,7 +67,7 @@ class PrinterModule : Module() {
                     ).getOrThrow()
             }
 
-            AsyncFunction("connectWifi") { ip: String, port: Int?, timeoutMs: Double? ->
+            AsyncFunction("connectWifi") Coroutine { ip: String, port: Int?, timeoutMs: Double? ->
                 sdk.bixolon.connectivity
                     .connectWifi(
                         ip = ip,
@@ -75,13 +76,13 @@ class PrinterModule : Module() {
                     ).getOrThrow()
             }
 
-            AsyncFunction("connectUsb") {
+            AsyncFunction("connectUsb") Coroutine {
                 sdk.bixolon.connectivity
                     .connectUsb()
                     .getOrThrow()
             }
 
-            AsyncFunction("disconnect") {
+            AsyncFunction("disconnect") Coroutine {
                 sdk.bixolon.connectivity
                     .disconnect()
                     .getOrThrow()
@@ -91,7 +92,7 @@ class PrinterModule : Module() {
                 sdk.bixolon.connectivity.isConnected()
             }
 
-            AsyncFunction("getStatus") {
+            AsyncFunction("getStatus") Coroutine {
                 val status =
                     sdk.bixolon.connectivity
                         .getStatus()
@@ -106,7 +107,7 @@ class PrinterModule : Module() {
                 )
             }
 
-            AsyncFunction("getInfo") {
+            AsyncFunction("getInfo") Coroutine {
                 val info =
                     sdk.bixolon.connectivity
                         .getInfo()
@@ -114,7 +115,7 @@ class PrinterModule : Module() {
                 mapOf(
                     "model" to info.model,
                     "firmware" to info.firmware,
-                    "serial" to info.serial,
+                    "serial" to info.serialNumber,
                     "dpi" to info.dpi,
                 )
             }
@@ -127,7 +128,7 @@ class PrinterModule : Module() {
             // PRINT API - Text
             // ============================================================
 
-            AsyncFunction("printText") { text: String, options: Map<String, Any?>? ->
+            AsyncFunction("printText") Coroutine { text: String, options: Map<String, Any?>? ->
                 val fontSize = parseFontSize(options?.get("fontSize") as? String)
                 val alignment = parseAlignment(options?.get("alignment") as? String)
                 val bold = options?.get("bold") as? Boolean ?: false
@@ -138,7 +139,7 @@ class PrinterModule : Module() {
                     .getOrThrow()
             }
 
-            AsyncFunction("printTexts") { texts: List<String>, options: Map<String, Any?>? ->
+            AsyncFunction("printTexts") Coroutine { texts: List<String>, options: Map<String, Any?>? ->
                 val fontSize = parseFontSize(options?.get("fontSize") as? String)
                 val media = parseMediaConfig(options?.get("media") as? Map<String, Any?>)
 
@@ -151,7 +152,7 @@ class PrinterModule : Module() {
             // PRINT API - QR & Barcode
             // ============================================================
 
-            AsyncFunction("printQR") { data: String, options: Map<String, Any?>? ->
+            AsyncFunction("printQR") Coroutine { data: String, options: Map<String, Any?>? ->
                 val size = (options?.get("size") as? Number)?.toInt() ?: 5
                 val alignment = parseAlignment(options?.get("alignment") as? String)
                 val media = parseMediaConfig(options?.get("media") as? Map<String, Any?>)
@@ -161,7 +162,7 @@ class PrinterModule : Module() {
                     .getOrThrow()
             }
 
-            AsyncFunction("printBarcode") { data: String, options: Map<String, Any?>? ->
+            AsyncFunction("printBarcode") Coroutine { data: String, options: Map<String, Any?>? ->
                 val type = parseBarcodeType(options?.get("type") as? String)
                 val height = (options?.get("height") as? Number)?.toInt() ?: 60
                 val alignment = parseAlignment(options?.get("alignment") as? String)
@@ -176,7 +177,7 @@ class PrinterModule : Module() {
             // PRINT API - Images & PDF
             // ============================================================
 
-            AsyncFunction("printImageBase64") { base64Data: String, options: Map<String, Any?>? ->
+            AsyncFunction("printImageBase64") Coroutine { base64Data: String, options: Map<String, Any?>? ->
                 val alignment = parseAlignment(options?.get("alignment") as? String)
                 val media = parseMediaConfig(options?.get("media") as? Map<String, Any?>)
 
@@ -185,7 +186,7 @@ class PrinterModule : Module() {
                     .getOrThrow()
             }
 
-            AsyncFunction("printPdfBase64") { base64Data: String, options: Map<String, Any?>? ->
+            AsyncFunction("printPdfBase64") Coroutine { base64Data: String, options: Map<String, Any?>? ->
                 val page = (options?.get("page") as? Number)?.toInt() ?: 1
                 val alignment = parseAlignment(options?.get("alignment") as? String)
                 val media = parseMediaConfig(options?.get("media") as? Map<String, Any?>)
@@ -203,7 +204,7 @@ class PrinterModule : Module() {
             // PRINT API - Receipt (High Level)
             // ============================================================
 
-            AsyncFunction("printReceipt") { receiptData: Map<String, Any?>, options: Map<String, Any?>? ->
+            AsyncFunction("printReceipt") Coroutine { receiptData: Map<String, Any?>, options: Map<String, Any?>? ->
                 val receipt = parseReceipt(receiptData)
                 val media = parseMediaConfig(options?.get("media") as? Map<String, Any?>)
                 val copies = (options?.get("copies") as? Number)?.toInt() ?: 1
@@ -217,7 +218,7 @@ class PrinterModule : Module() {
             // PRINT API - Columns (Key-Value style)
             // ============================================================
 
-            AsyncFunction("printKeyValue") { key: String, value: String, options: Map<String, Any?>? ->
+            AsyncFunction("printKeyValue") Coroutine { key: String, value: String, options: Map<String, Any?>? ->
                 val fontSize = parseFontSize(options?.get("fontSize") as? String)
                 val bold = options?.get("bold") as? Boolean ?: false
                 val media = parseMediaConfig(options?.get("media") as? Map<String, Any?>)

@@ -1,54 +1,26 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
 }
 
 group = 'sincpro.expo.printer'
-version = '0.1.0'
+version = '1.0.2'
 
 android {
   namespace "sincpro.expo.printer"
-  compileSdk 35
-
   defaultConfig {
-    minSdk 21
-    targetSdk 35
     versionCode 1
-    versionName "0.1.0"
-  }
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
-  }
-
-  kotlinOptions {
-    jvmTarget = '17'
-  }
-
-  lintOptions {
-    abortOnError false
+    versionName "1.0.2"
   }
 }
 
 dependencies {
-  // Sincpro Printer SDK (incluye Bixolon JARs + jniLibs embebidos)
-  implementation files('libs/sincpro-printer-sdk.aar')
-  
-  // Bixolon PDF support (AAR no puede embeber otro AAR)
-  implementation files('libs/pdf/Bixolon_pdf.aar')
+  // AAR locales - mismo nivel como test app
+  implementation files("${projectDir}/libs/sincpro-printer-sdk.aar")
+  implementation files("${projectDir}/libs/Bixolon_pdf.aar")
 
-  // Expo modules (provided by host app)
-  compileOnly 'expo.modules:core:3.0.29'
-
+  // Dependencias Android
   implementation 'androidx.core:core-ktx:1.12.0'
   implementation 'androidx.appcompat:appcompat:1.6.1'
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-}
-repositories {
-    mavenCentral()
-}
-kotlin {
-    jvmToolchain(17)
 }
