@@ -4,10 +4,16 @@ import android.content.Context
 import com.sincpro.printer.SincproPrinterSdk
 import com.sincpro.printer.domain.Alignment
 import com.sincpro.printer.domain.BarcodeType
+import com.sincpro.printer.domain.CutterConfig
+import com.sincpro.printer.domain.Density
 import com.sincpro.printer.domain.FontSize
 import com.sincpro.printer.domain.MediaConfig
+import com.sincpro.printer.domain.MediaType
+import com.sincpro.printer.domain.Orientation
+import com.sincpro.printer.domain.PrinterConfig
 import com.sincpro.printer.domain.Receipt
 import com.sincpro.printer.domain.ReceiptLine
+import com.sincpro.printer.domain.Speed
 import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -122,6 +128,42 @@ class PrinterModule : Module() {
 
             Function("getDpi") {
                 sdk.bixolon.connectivity.getDpi()
+            }
+
+            // ============================================================
+            // CONFIGURATION API
+            // ============================================================
+
+            /**
+             * Set and apply printer configuration
+             * - Sets as default for future connections
+             * - If connected, applies immediately to printer
+             */
+            AsyncFunction("setConfig") Coroutine { config: Map<String, Any?> ->
+                val printerConfig = parsePrinterConfig(config)
+                sdk.bixolon.connectivity.setDefaultConfig(printerConfig)
+                // Apply immediately if connected
+                if (sdk.bixolon.connectivity.isConnected()) {
+                    sdk.bixolon.connectivity
+                        .applyConfig(printerConfig)
+                        .getOrThrow()
+                }
+            }
+
+            Function("getConfig") {
+                val config = sdk.bixolon.connectivity.getDefaultConfig()
+                mapOf(
+                    "marginLeft" to config.marginLeft,
+                    "marginTop" to config.marginTop,
+                    "density" to config.density.name.lowercase(),
+                    "speed" to config.speed.name.lowercase(),
+                    "orientation" to config.orientation.name.lowercase(),
+                    "autoCutter" to
+                        mapOf(
+                            "enabled" to config.autoCutter.enabled,
+                            "fullCut" to config.autoCutter.fullCut,
+                        ),
+                )
             }
 
             // ============================================================
@@ -270,15 +312,84 @@ class PrinterModule : Module() {
         if (preset != null) {
             return when (preset) {
                 "continuous58mm" -> MediaConfig.continuous58mm()
+                "continuous72mm" -> MediaConfig.continuous72mm()
                 "continuous80mm" -> MediaConfig.continuous80mm()
                 else -> MediaConfig.continuous80mm()
             }
         }
 
+        // Custom width in mm (converts to dots automatically)
+        val widthMm = (data["widthMm"] as? Number)?.toInt()
+        if (widthMm != null) {
+            val heightMm = (data["heightMm"] as? Number)?.toInt() ?: 0
+            val type = parseMediaType(data["type"] as? String)
+            val gapMm = (data["gapMm"] as? Number)?.toInt() ?: 0
+
+            return when (type) {
+                MediaType.CONTINUOUS -> MediaConfig.continuous(widthMm)
+                MediaType.GAP -> MediaConfig.label(widthMm, heightMm, gapMm)
+                MediaType.BLACK_MARK -> MediaConfig.blackMark(widthMm, heightMm, gapMm)
+            }
+        }
+
+        // Direct dots configuration
         val widthDots = (data["widthDots"] as? Number)?.toInt() ?: 640
         val heightDots = (data["heightDots"] as? Number)?.toInt() ?: 0
+        val type = parseMediaType(data["type"] as? String)
+        val gapDots = (data["gapDots"] as? Number)?.toInt() ?: 0
 
-        return MediaConfig(widthDots, heightDots)
+        return MediaConfig(widthDots, heightDots, type, gapDots)
+    }
+
+    private fun parseMediaType(value: String?): MediaType =
+        when (value?.lowercase()) {
+            "continuous" -> MediaType.CONTINUOUS
+            "gap", "label" -> MediaType.GAP
+            "black_mark", "blackmark" -> MediaType.BLACK_MARK
+            else -> MediaType.CONTINUOUS
+        }
+
+    private fun parsePrinterConfig(data: Map<String, Any?>): PrinterConfig {
+        val marginLeft = (data["marginLeft"] as? Number)?.toInt() ?: 0
+        val marginTop = (data["marginTop"] as? Number)?.toInt() ?: 0
+        val density = parseDensity(data["density"] as? String)
+        val speed = parseSpeed(data["speed"] as? String)
+        val orientation = parseOrientation(data["orientation"] as? String)
+        val autoCutter = parseCutterConfig(data["autoCutter"] as? Map<String, Any?>)
+
+        return PrinterConfig(marginLeft, marginTop, density, speed, orientation, autoCutter)
+    }
+
+    private fun parseDensity(value: String?): Density =
+        when (value?.lowercase()) {
+            "light" -> Density.LIGHT
+            "medium" -> Density.MEDIUM
+            "dark" -> Density.DARK
+            "extra_dark", "extradark" -> Density.EXTRA_DARK
+            else -> Density.MEDIUM
+        }
+
+    private fun parseSpeed(value: String?): Speed =
+        when (value?.lowercase()) {
+            "slow" -> Speed.SLOW
+            "medium" -> Speed.MEDIUM
+            "fast" -> Speed.FAST
+            "extra_fast", "extrafast" -> Speed.EXTRA_FAST
+            else -> Speed.MEDIUM
+        }
+
+    private fun parseOrientation(value: String?): Orientation =
+        when (value?.lowercase()) {
+            "top_to_bottom", "toptobottom" -> Orientation.TOP_TO_BOTTOM
+            "bottom_to_top", "bottomtotop" -> Orientation.BOTTOM_TO_TOP
+            else -> Orientation.TOP_TO_BOTTOM
+        }
+
+    private fun parseCutterConfig(data: Map<String, Any?>?): CutterConfig {
+        if (data == null) return CutterConfig.DISABLED
+        val enabled = data["enabled"] as? Boolean ?: false
+        val fullCut = data["fullCut"] as? Boolean ?: true
+        return CutterConfig(enabled, fullCut)
     }
 
     private fun parseReceipt(data: Map<String, Any?>): Receipt {

@@ -33,18 +33,79 @@ export interface PrinterInfo {
  * Media configuration
  */
 export interface MediaConfig {
-  /** Use preset instead of manual widthDots/heightDots */
+  /** Use preset instead of manual configuration */
   preset?: MediaPreset;
-  /** Width in dots (ignored if preset is set) */
+  
+  /** Custom width in millimeters (auto-converts to dots) */
+  widthMm?: number;
+  /** Custom height in millimeters (for labels) */
+  heightMm?: number;
+  /** Gap/mark size in millimeters */
+  gapMm?: number;
+  
+  /** Width in dots (use widthMm for easier configuration) */
   widthDots?: number;
-  /** Height in dots (ignored if preset is set) */
+  /** Height in dots (use heightMm for easier configuration) */
   heightDots?: number;
+  /** Gap in dots */
+  gapDots?: number;
+  
+  /** Media type */
+  type?: MediaType;
 }
 
 /**
  * Media presets
  */
-export type MediaPreset = 'continuous58mm' | 'continuous80mm';
+export type MediaPreset = 'continuous58mm' | 'continuous72mm' | 'continuous80mm';
+
+/**
+ * Media type for labels and continuous paper
+ */
+export type MediaType = 'continuous' | 'gap' | 'label' | 'black_mark';
+
+/**
+ * Printer configuration (global settings)
+ */
+export interface PrinterConfig {
+  /** Left margin in dots */
+  marginLeft?: number;
+  /** Top margin in dots */
+  marginTop?: number;
+  /** Print density */
+  density?: PrintDensity;
+  /** Print speed */
+  speed?: PrintSpeed;
+  /** Print orientation */
+  orientation?: PrintOrientation;
+  /** Auto cutter configuration */
+  autoCutter?: CutterConfig;
+}
+
+/**
+ * Print density levels
+ */
+export type PrintDensity = 'light' | 'medium' | 'dark' | 'extra_dark';
+
+/**
+ * Print speed levels
+ */
+export type PrintSpeed = 'slow' | 'medium' | 'fast' | 'extra_fast';
+
+/**
+ * Print orientation
+ */
+export type PrintOrientation = 'top_to_bottom' | 'bottom_to_top';
+
+/**
+ * Auto cutter configuration
+ */
+export interface CutterConfig {
+  /** Enable auto cutter */
+  enabled: boolean;
+  /** Full cut (true) or partial cut (false) */
+  fullCut?: boolean;
+}
 
 /**
  * Font size options

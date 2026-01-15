@@ -9,7 +9,7 @@
 
 // Main module export
 export { default } from './SincproPrinter';
-export { bluetooth, connection, print } from './SincproPrinter';
+export { bluetooth, connection, config, print } from './SincproPrinter';
 
 // Type exports
 export * from './types';

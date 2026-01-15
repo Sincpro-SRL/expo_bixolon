@@ -10,7 +10,9 @@ data class MediaConfig(
         private const val DOTS_PER_MM = 8
 
         fun continuous80mm() = MediaConfig(640, 0, MediaType.CONTINUOUS)
+        fun continuous72mm() = MediaConfig(576, 0, MediaType.CONTINUOUS)
         fun continuous58mm() = MediaConfig(464, 0, MediaType.CONTINUOUS)
+        fun continuous(widthMm: Int) = MediaConfig(widthMm * DOTS_PER_MM, 0, MediaType.CONTINUOUS)
 
         fun label(widthMm: Int, heightMm: Int, gapMm: Int = 3) = MediaConfig(
             widthDots = widthMm * DOTS_PER_MM,
