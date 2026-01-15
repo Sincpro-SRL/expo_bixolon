@@ -42,6 +42,15 @@ class BixolonConnectivityService(
         defaultConfig = config
     }
 
+    fun getDefaultConfig(): PrinterConfig = defaultConfig
+
+    /**
+     * Apply configuration to connected printer immediately
+     */
+    suspend fun applyConfig(config: PrinterConfig = defaultConfig): Result<Unit> {
+        return printer.configure(config)
+    }
+
     suspend fun disconnect(): Result<Unit> = printer.disconnect()
 
     fun isConnected(): Boolean = printer.isConnected()

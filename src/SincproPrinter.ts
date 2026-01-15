@@ -4,6 +4,7 @@ import type {
   PairedPrinter,
   PrinterStatus,
   PrinterInfo,
+  PrinterConfig,
   PrintTextOptions,
   PrintTextsOptions,
   PrintQROptions,
@@ -32,6 +33,10 @@ interface SincproPrinterNativeModule {
   getStatus(): Promise<PrinterStatus>;
   getInfo(): Promise<PrinterInfo>;
   getDpi(): number;
+
+  // Configuration
+  setConfig(config: PrinterConfig): Promise<void>;
+  getConfig(): PrinterConfig;
 
   // Print - Text
   printText(text: string, options?: PrintTextOptions): Promise<void>;
@@ -128,6 +133,36 @@ export const connection = {
    * Get printer DPI
    */
   getDpi: (): number => NativeModule.getDpi(),
+};
+
+// ============================================================
+// CONFIGURATION API
+// ============================================================
+
+/**
+ * Configuration API for printer settings
+ */
+export const config = {
+  /**
+   * Set printer configuration (margins, density, speed, cutter)
+   * This sets the default config and applies it immediately if connected
+   * @example
+   * ```ts
+   * await config.set({
+   *   marginLeft: 10,
+   *   marginTop: 5,
+   *   density: 'dark',
+   *   speed: 'fast',
+   *   autoCutter: { enabled: true, fullCut: true }
+   * });
+   * ```
+   */
+  set: (printerConfig: PrinterConfig): Promise<void> => NativeModule.setConfig(printerConfig),
+
+  /**
+   * Get current printer configuration
+   */
+  get: (): PrinterConfig => NativeModule.getConfig(),
 };
 
 // ============================================================
